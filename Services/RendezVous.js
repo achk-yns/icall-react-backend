@@ -45,11 +45,11 @@ route.get('/:NOM',authMiddleware,async (req,res) => {
     }
 })
 
-route.put("/:NOM/edit" , async (req,res)=>{
+route.put("/:NOM/edit" , authMiddleware , async (req,res)=>{
     const {NOM} = req.params 
+    const user_id = req.userId
     if(req.body){
-
-        const FindRendezvous =await RendezVous.findOneAndUpdate({NOM},req.body,{new:true});
+        const FindRendezvous =await RendezVous.findOneAndUpdate({NOM , user_id },req.body,{new:true});
         if(FindRendezvous){
             res.status(200).send({data: FindRendezvous})
         }
@@ -61,9 +61,10 @@ route.put("/:NOM/edit" , async (req,res)=>{
 
 
 
-route.delete('/:NOM' , async (req,res) => {
+route.delete('/:NOM' , authMiddleware , async (req,res) => {
     const {NOM} = req.params 
-    const FindRendezvous =await RendezVous.findOne({NOM});
+    const user_id = req.userId
+    const FindRendezvous =await RendezVous.findOne({NOM,user_id});
     if(FindRendezvous){
         const FindRendezvous =await RendezVous.findOneAndDelete({NOM});
         res.status(200).send({message  : "REMOVE RENDEZ-VOUS",data: FindRendezvous})
