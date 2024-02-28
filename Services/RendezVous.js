@@ -4,11 +4,13 @@ const RendezVous = require("../Models/RendezVous")
 const localStorage = require('localStorage');
 const authMiddleware = require("../middlewares/AuthMiddleware")
 
-route.post('/', async function(req, res){
+
+route.post('/',authMiddleware,async function(req, res){
     const {NOM , PRENOM , TELEPHONE , ADRESSE} = req.body ; 
-    const FindRendezvous =await RendezVous.findOne({NOM});
+    const user_id = req.userId;
+    const FindRendezvous =await RendezVous.findOne({NOM,user_id});
     if (!FindRendezvous){
-        const newRendezVous = new RendezVous(req.body);
+        const newRendezVous = new RendezVous({...req.body,user_id});
         const DataSave = await newRendezVous.save();
         res.status(200).send({message: "Rendez-vous created <3 ", data: DataSave} )
     }
@@ -18,12 +20,12 @@ route.post('/', async function(req, res){
 })
 
 
-route.get('/',async (req,res) => {
-    localStorage.setItem('user', "younessAchak");    
-    const AllData  = await RendezVous.find();
+
+route.get('/',authMiddleware,async (req,res) => {
+    const user_id = req.userId  
+    const AllData  = await RendezVous.find({user_id});
     if(AllData){
         res.status(200).send({data: AllData})
-        
     }
     else
     {
@@ -31,9 +33,10 @@ route.get('/',async (req,res) => {
     }
 })
 
-route.get('/:NOM' , async (req,res) => {
+route.get('/:NOM',authMiddleware,async (req,res) => {
     const {NOM} = req.params 
-    const FindRendezvous =await RendezVous.findOne({NOM});
+    const user_id = req.userId  
+    const FindRendezvous =await RendezVous.findOne({NOM,user_id});
     if(FindRendezvous){
         res.status(200).send({data: FindRendezvous})
     }

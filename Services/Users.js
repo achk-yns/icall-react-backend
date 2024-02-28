@@ -6,13 +6,13 @@ const bcrypt = require("bcrypt")
 require("dotenv").config()
 
 route.post("/login" , async (req,res)=>{
-    const {EMAIL,PASSWORD,isAdmin} = req.body ; 
+    const {EMAIL,PASSWORD} = req.body ; 
     const FindUser =await User.findOne({EMAIL});
     if (FindUser){
-      const checkPwd =await bcrypt.compareSync(PASSWORD,FindUser.PASSWORD)
+      const checkPwd =await bcrypt.compare(PASSWORD,FindUser.PASSWORD)
       if(checkPwd){
-        const {email,isadmin} = FindUser
-        const Token = await jwt.sign({email,isadmin},process.env.Jwt_SECRETKEY,{expiresIn:'24h'})
+        const {_id,isAdmin} = FindUser
+        const Token = await jwt.sign({_id,isAdmin},process.env.Jwt_SECRETKEY)
         res.header('token',Token);
         res.status(200).send({message: "Connected....",Token})
       }else{

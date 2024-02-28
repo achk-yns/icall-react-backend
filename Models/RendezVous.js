@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const schema = mongoose.model("RendezVous" , {
-    
+    user_id :{
+      type:mongoose.Schema.Types.ObjectId,
+      ref:"User"
+    },
+    createdRv:{ type: Date, default: Date.now },
       NOM: {
         type: String,
         required: true,
